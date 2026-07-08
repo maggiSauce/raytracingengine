@@ -11,14 +11,14 @@ struct Light {
     brightness: f64,
 }
 
+#[derive(Debug)]
 struct Camera {
     viewport_height: f32,
-    focal_lentgh: f32,
+    viewport_width: f32,
+    focal_length: f32,
 }
 
-
-
-
+#[derive(Debug)]
 struct Scene {
     image_height: i32,
     image_width: i32,
@@ -26,11 +26,11 @@ struct Scene {
     camera: Camera,
     light: Light,
 
-    colors: Vec<String>,
-    background_color: usize,
+    colors: Vec<u32>,
+    bg_colour_index: u32,
 }
 
-fn create_scene_from_file(path: &str) -> Result<(), io::Error>{
+fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let contents = fs::read_to_string(path)?;
     let mut lines = contents.lines();
 
@@ -45,8 +45,12 @@ fn create_scene_from_file(path: &str) -> Result<(), io::Error>{
 
     // Camera
     let viewport_height: f32 = lines.next().unwrap().parse().unwrap();
-    let focal_length: f32 = lines.next().unwrap().parse().unwrap();
-
+    let camera = Camera {
+        viewport_height: viewport_height,
+        viewport_width: (width as f32 / height as f32) * viewport_height,
+        focal_length: lines.next().unwrap().parse().unwrap(),
+    };
+    
     // Light
     let mut light_parts = lines.next().unwrap().split_whitespace();
     let light = Light {
@@ -55,12 +59,30 @@ fn create_scene_from_file(path: &str) -> Result<(), io::Error>{
             y: light_parts.next().unwrap().parse().unwrap(),
             z: light_parts.next().unwrap().parse().unwrap(),
         },
-        brightness: lines.next().unwrap().parse().unwrap(),
+        brightness: light_parts.next().unwrap().parse().unwrap(),
     };
 
-    println!("{:?}", light);
+    // colors
+    lines.next();   // consume the numcolors value
+    let mut colours: Vec<u32> = lines
+        .next()
+        .unwrap()
+        .split_whitespace()
+        .map(|s| u32::from_str_radix(s.trim_start_matches("0x"), 16).unwrap())
+        .collect();
+    colours.sort();
+    let bg_colour_index:u32 = lines.next().unwrap().parse().unwrap();
 
-    Ok(())
+    let scene = Scene {
+        image_height: height,
+        image_width: width,
+        camera: camera,
+        light: light,
+        colors: colours,
+        bg_colour_index: bg_colour_index,
+    };
+
+    Ok(scene)
 }
 
 const SHADOWFACTOR: f64 = 0.1;
@@ -73,6 +95,7 @@ fn main() {
     }
 
     // let scene: Scene = create_scene_from_file(args[1]);
-    create_scene_from_file(&args[1]);
+    let scene = create_scene_from_file(&args[1]).unwrap();
+    println!("{:#?}", scene);
 }
 
