@@ -14,7 +14,7 @@ struct Light {
 }
 
 #[derive(Debug)]
-struct Camera {
+struct Viewport {
     viewport_height: f32,
     viewport_width: f32,
     focal_length: f32,
@@ -25,7 +25,7 @@ struct Scene {
     image_height: i32,
     image_width: i32,
 
-    camera: Camera,
+    viewport: Viewport,
     light: Light,
 
     colors: Vec<u32>,
@@ -33,6 +33,9 @@ struct Scene {
 
     spheres: Vec<Sphere>,
 }
+
+const SHADOWFACTOR: f64 = 0.1;
+const CAMERA: Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
 fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let contents = fs::read_to_string(path)?;
@@ -49,7 +52,7 @@ fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
 
     // Camera
     let viewport_height: f32 = lines.next().unwrap().parse().unwrap();
-    let camera = Camera {
+    let viewport = Viewport {
         viewport_height: viewport_height,
         viewport_width: (width as f32 / height as f32) * viewport_height,
         focal_length: lines.next().unwrap().parse().unwrap(),
@@ -99,7 +102,7 @@ fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let scene = Scene {
         image_height: height,
         image_width: width,
-        camera: camera,
+        viewport: viewport,
         light: light,
         colors: colours,
         bg_colour_index: bg_colour_index,
@@ -109,8 +112,6 @@ fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     Ok(scene)
 }
 
-const SHADOWFACTOR: f64 = 0.1;
-const CAMERA: Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
