@@ -1,21 +1,18 @@
 use crate::vector::{Vec3};
-use std::env;
-use std::fmt::Error;
-use std::fs::File;
+use std::{env, fs};
 use std::io::{self, BufRead, BufReader};
 
 mod vector;
 mod sphere;
 
+#[derive(Debug)]
 struct Light {
     position: Vec3,
-    rgb: Vec3,
     brightness: f64,
 }
 
 struct Camera {
     viewport_height: f32,
-    viewport_weidth: f32,
     focal_lentgh: f32,
 }
 
@@ -33,15 +30,35 @@ struct Scene {
     background_color: usize,
 }
 
-fn create_scene_from_file(file_path: &str) -> Result<(), io::Error>{
-    let file = File::open(file_path)?;
-    let reader = io::BufReader::new(file);
+fn create_scene_from_file(path: &str) -> Result<(), io::Error>{
+    let contents = fs::read_to_string(path)?;
+    let mut lines = contents.lines();
 
-    let lines = reader.lines();
-    let dimensions = lines.next();
-    
+    // Dimensions
+    let (height, width) = lines
+        .next()
+        .unwrap()
+        .split_once(" ")
+        .unwrap();
+    let height: i32 = height.trim().parse().unwrap();
+    let width: i32  = width.trim().parse().unwrap();
 
+    // Camera
+    let viewport_height: f32 = lines.next().unwrap().parse().unwrap();
+    let focal_length: f32 = lines.next().unwrap().parse().unwrap();
 
+    // Light
+    let mut light_parts = lines.next().unwrap().split_whitespace();
+    let light = Light {
+        position: Vec3 {
+            x: light_parts.next().unwrap().parse().unwrap(),
+            y: light_parts.next().unwrap().parse().unwrap(),
+            z: light_parts.next().unwrap().parse().unwrap(),
+        },
+        brightness: lines.next().unwrap().parse().unwrap(),
+    };
+
+    println!("{:?}", light);
 
     Ok(())
 }
@@ -57,9 +74,5 @@ fn main() {
 
     // let scene: Scene = create_scene_from_file(args[1]);
     create_scene_from_file(&args[1]);
-    
-    let (image_H, image_W): (i32, i32);
-    let focal_length: f64;
-    let bgColour: Vec3;
 }
 
