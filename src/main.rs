@@ -1,4 +1,6 @@
+use crate::sphere::Sphere;
 use crate::vector::{Vec3};
+use core::num;
 use std::{env, fs};
 use std::io::{self, BufRead, BufReader};
 
@@ -28,6 +30,8 @@ struct Scene {
 
     colors: Vec<u32>,
     bg_colour_index: u32,
+
+    spheres: Vec<Sphere>,
 }
 
 fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
@@ -73,6 +77,25 @@ fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     colours.sort();
     let bg_colour_index:u32 = lines.next().unwrap().parse().unwrap();
 
+    // Spheres
+    let mut spheres = Vec::new();
+    let num_spheres: u32 = lines.next().unwrap().parse().unwrap();
+    for i in 0..num_spheres {
+        let mut sphere_parts = lines.next().unwrap().split_whitespace();
+        let sphere_col = Vec3 { x: 1.0, y: 1.0, z: 1.0 };
+        let sphere = Sphere {
+            pos: Vec3 {
+                x: sphere_parts.next().unwrap().parse().unwrap(),
+                y: sphere_parts.next().unwrap().parse().unwrap(),
+                z: sphere_parts.next().unwrap().parse().unwrap(),
+            },
+            r: sphere_parts.next().unwrap().parse().unwrap(),
+            colour: sphere_col,
+        };
+        spheres.push(sphere);
+    }
+
+
     let scene = Scene {
         image_height: height,
         image_width: width,
@@ -80,6 +103,7 @@ fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
         light: light,
         colors: colours,
         bg_colour_index: bg_colour_index,
+        spheres: spheres,
     };
 
     Ok(scene)

@@ -1,5 +1,6 @@
 use crate::vector::*;
 
+#[derive(Debug)]
 pub struct Sphere {
     pub r: f64,
     pub pos: Vec3,
