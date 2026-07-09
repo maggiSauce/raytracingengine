@@ -1,11 +1,13 @@
+mod vector;
+mod sphere;
+mod colour;
+
 use crate::sphere::Sphere;
 use crate::vector::{Vec3};
+use colour::unpackRGB;
 use core::num;
 use std::{env, fs};
 use std::io::{self, BufRead, BufReader};
-
-mod vector;
-mod sphere;
 
 #[derive(Debug)]
 struct Light {
@@ -85,16 +87,20 @@ fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let num_spheres: u32 = lines.next().unwrap().parse().unwrap();
     for i in 0..num_spheres {
         let mut sphere_parts = lines.next().unwrap().split_whitespace();
-        let sphere_col = Vec3 { x: 1.0, y: 1.0, z: 1.0 };
-        let sphere = Sphere {
+
+        let mut sphere = Sphere {
             pos: Vec3 {
                 x: sphere_parts.next().unwrap().parse().unwrap(),
                 y: sphere_parts.next().unwrap().parse().unwrap(),
                 z: sphere_parts.next().unwrap().parse().unwrap(),
             },
             r: sphere_parts.next().unwrap().parse().unwrap(),
-            colour: sphere_col,
+            colour: Vec3 { x: 1.0, y: 1.0, z: 1.0 },
         };
+
+        let sphere_col_index: usize = sphere_parts.next().unwrap().parse().unwrap();
+        sphere.colour = unpackRGB(colours[sphere_col_index]);
+        
         spheres.push(sphere);
     }
 
