@@ -1,11 +1,11 @@
 use crate::vector::*;
 
-pub fn unpackRGB(packedRGB: u32) -> Vec3 {
+pub fn unpack_rgb(packed_rgb: u32) -> Vec3 {
     let mask:u32 = 0xFF;
     Vec3 {
-        x: (((packedRGB >> 16) & mask) as f64) / 255.0,
-        y: (((packedRGB >> 8) & mask) as f64) / 255.0,
-        z: (((packedRGB) & mask) as f64) / 255.0,
+        x: (((packed_rgb >> 16) & mask) as f64) / 255.0,
+        y: (((packed_rgb >> 8) & mask) as f64) / 255.0,
+        z: (((packed_rgb) & mask) as f64) / 255.0,
     }
 }
 
@@ -48,7 +48,7 @@ mod tests {
 
     #[test]
     fn test_unpack_black() {
-        let result = unpackRGB(0x000000);
+        let result = unpack_rgb(0x000000);
 
         assert_vec3_close(
             result,
@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_unpack_white() {
-        let result = unpackRGB(0xFFFFFF);
+        let result = unpack_rgb(0xFFFFFF);
 
         assert_vec3_close(
             result,
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_unpack_red() {
-        let result = unpackRGB(0xFF0000);
+        let result = unpack_rgb(0xFF0000);
 
         assert_vec3_close(
             result,
@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn test_unpack_green() {
-        let result = unpackRGB(0x00FF00);
+        let result = unpack_rgb(0x00FF00);
 
         assert_vec3_close(
             result,
@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_unpack_blue() {
-        let result = unpackRGB(0x0000FF);
+        let result = unpack_rgb(0x0000FF);
 
         assert_vec3_close(
             result,
@@ -118,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_unpack_gray() {
-        let result = unpackRGB(0x808080);
+        let result = unpack_rgb(0x808080);
 
         assert_vec3_close(
             result,
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_unpack_arbitrary_color() {
-        let result = unpackRGB(0x336699);
+        let result = unpack_rgb(0x336699);
 
         assert_vec3_close(
             result,
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_unpack_channel_boundaries() {
-        let result = unpackRGB(0x010203);
+        let result = unpack_rgb(0x010203);
 
         assert_vec3_close(
             result,
@@ -160,7 +160,7 @@ mod tests {
 
     #[test]
     fn test_unpack_ignores_upper_bits() {
-        let result = unpackRGB(0xFF336699);
+        let result = unpack_rgb(0xFF336699);
 
         assert_vec3_close(
             result,
