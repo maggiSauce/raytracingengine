@@ -14,9 +14,18 @@ pub struct Light {
 
 #[derive(Debug)]
 pub struct Viewport {
-    pub viewport_height: f32,
-    pub viewport_width: f32,
+    pub height: f32,
+    pub width: f32,
     pub focal_length: f32,
+
+    pub height_vec: Vec3,
+    pub half_height_vec: Vec3,
+
+    pub width_vec: Vec3,
+    pub half_width_vec: Vec3,
+
+    pub pixel_width: Vec3,
+    pub pixel_height: Vec3,
 }
 
 #[derive(Debug)]
@@ -65,20 +74,34 @@ pub fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let mut lines = contents.lines();
 
     // Dimensions
-    let (width, height) = lines
+    let (image_width, image_height) = lines
         .next()
         .unwrap()
         .split_once(" ")
         .unwrap();
-    let height: i32 = height.trim().parse().unwrap();
-    let width: i32  = width.trim().parse().unwrap();
+    let image_height: i32 = image_height.trim().parse().unwrap();
+    let image_width: i32  = image_width.trim().parse().unwrap();
 
     // Camera
     let viewport_height: f32 = lines.next().unwrap().parse().unwrap();
+    let viewport_width: f32 = (image_width as f32 / image_height as f32) * viewport_height;
+    
+    let viewport_height_vec = Vec3 { x: 0.0, y: image_height as f64, z: 0.0 };
+    let viewport_width_vec = Vec3 { x: image_width as f64, y: 0.0, z: 0.0 };
+
     let viewport = Viewport {
-        viewport_height: viewport_height,
-        viewport_width: (width as f32 / height as f32) * viewport_height,
+        height: viewport_height,
+        width: viewport_width,
         focal_length: lines.next().unwrap().parse().unwrap(),
+
+        height_vec: viewport_height_vec,
+        width_vec: viewport_width_vec,
+
+        half_height_vec: viewport_height_vec / 2.0,
+        half_width_vec: viewport_width_vec / 2.0,
+
+        pixel_height: viewport_height_vec / image_height as f64,
+        pixel_width: viewport_width_vec / image_width as f64,
     };
     
     // Light
@@ -112,8 +135,8 @@ pub fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     }
 
     let scene = Scene {
-        image_height: height,
-        image_width: width,
+        image_height,
+        image_width,
         viewport: viewport,
         light: light,
         colors: colours,

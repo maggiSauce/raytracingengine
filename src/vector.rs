@@ -53,7 +53,7 @@ impl Div<f64> for Vec3 {
 
 impl Vec3 {
     pub fn length2(self: Vec3) -> f64 {
-    (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
+        (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
     }
 
     pub fn length(self) -> f64 {
