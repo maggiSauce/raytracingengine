@@ -1,4 +1,5 @@
 use crate::vector::*;
+use std::io::{self, Write};
 
 pub fn unpack_rgb(packed_rgb: u32) -> Vec3 {
     let mask:u32 = 0xFF;
@@ -7,6 +8,17 @@ pub fn unpack_rgb(packed_rgb: u32) -> Vec3 {
         y: (((packed_rgb >> 8) & mask) as f64) / 255.0,
         z: (((packed_rgb) & mask) as f64) / 255.0,
     }
+}
+
+pub fn write_color(file: &mut impl Write, colour: Vec3) -> io::Result<()> {
+    write!(
+        file, "{} {} {}", 
+        (colour.x * 255.0) as u8, 
+        (colour.y * 255.0) as u8, 
+        (colour.z * 255.0) as u8
+    )?;
+    
+    Ok(())
 }
 
 #[cfg(test)]

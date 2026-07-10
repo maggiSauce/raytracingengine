@@ -1,4 +1,5 @@
 use crate::vector::*;
+use crate::unpack_rgb;
 
 #[derive(Debug)]
 pub struct Sphere {
@@ -49,7 +50,7 @@ impl Sphere {
     
 }
 
-fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
+pub fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
     let descriminant = (b * b) - (4.0 * a * c);
 
     // does not intersect
@@ -63,6 +64,27 @@ fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
     let t2 = (-b - sqrt_d) / (2.0 * a);
 
     Some((t1, t2))
+}
+
+pub fn create_sphere(mut instructions: std::str::SplitWhitespace<'_>, colours: &Vec<u32>) -> Sphere {
+    let x: f64 = instructions.next().unwrap().parse().unwrap();
+    let y: f64 = instructions.next().unwrap().parse().unwrap();
+    let z: f64 = instructions.next().unwrap().parse().unwrap();
+
+    let radius: f64 = instructions.next().unwrap().parse().unwrap();
+
+    let sphere_col_index: usize = instructions.next().unwrap().parse().unwrap();
+    let sphere_rgb = unpack_rgb(colours[sphere_col_index]);
+    
+    Sphere {
+        pos: Vec3 {
+            x: x,
+            y: y,
+            z: z,
+        },
+        r: radius,
+        colour: sphere_rgb,
+    }
 }
 
 #[cfg(test)]

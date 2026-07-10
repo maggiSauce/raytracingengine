@@ -1,6 +1,7 @@
 use crate::vector::*;
-use crate::sphere::Sphere;
-use crate::unpack_rgb;
+use crate::sphere::*;
+use std::fs::File;
+use std::io::Write;
 
 use std::{fs};
 use std::io::{self};
@@ -32,33 +33,12 @@ pub struct Scene {
     spheres: Vec<Sphere>,
 }
 
-pub fn create_sphere(mut instructions: std::str::SplitWhitespace<'_>, colours: &Vec<u32>) -> Sphere {
-    let x: f64 = instructions.next().unwrap().parse().unwrap();
-    let y: f64 = instructions.next().unwrap().parse().unwrap();
-    let z: f64 = instructions.next().unwrap().parse().unwrap();
-
-    let radius: f64 = instructions.next().unwrap().parse().unwrap();
-
-    let sphere_col_index: usize = instructions.next().unwrap().parse().unwrap();
-    let sphere_rgb = unpack_rgb(colours[sphere_col_index]);
-    
-    Sphere {
-        pos: Vec3 {
-            x: x,
-            y: y,
-            z: x,
-        },
-        r: radius,
-        colour: sphere_rgb,
-    }
-}
-
 pub fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let contents = fs::read_to_string(path)?;
     let mut lines = contents.lines();
 
     // Dimensions
-    let (height, width) = lines
+    let (width, height) = lines
         .next()
         .unwrap()
         .split_once(" ")
@@ -115,4 +95,13 @@ pub fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     };
 
     Ok(scene)
+}
+
+pub fn create_output_ppm_file(path: &str, scene: &Scene) -> io::Result<File> {
+    let mut ppm_file = File::create(path)?;
+    writeln!(ppm_file, "P3")?;
+    writeln!(ppm_file, "{} {}", scene.image_width, scene.image_height)?;
+    writeln!(ppm_file, "255")?;
+
+    Ok(ppm_file)
 }
