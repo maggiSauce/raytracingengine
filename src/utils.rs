@@ -30,38 +30,22 @@ pub struct Viewport {
 
 #[derive(Debug)]
 pub struct Scene {
-    image_height: i32,
-    image_width: i32,
+    pub image_height: i32,
+    pub image_width: i32,
 
-    viewport: Viewport,
-    light: Light,
+    pub viewport: Viewport,
+    pub light: Light,
 
+    pub bg_colour_index: u32,
     colors: Vec<u32>,
-    bg_colour_index: u32,
 
     spheres: Vec<Sphere>,
 }
 
 impl Scene {
     /// returns dimensions of the scene in the format (imageH, imageW)
-    pub fn dimensions(&self) -> (i32, i32) {
-        (self.image_height, self.image_width)
-    }
-
-    pub fn viewport(&self) -> &Viewport {
-        &self.viewport
-    }
-
-    pub fn light(&self) -> &Light {
-        &self.light
-    }
-
     pub fn colors(&self) -> &[u32] {
         &self.colors
-    }
-
-    pub fn bg_colour_index(&self) -> u32 {
-        self.bg_colour_index
     }
 
     pub fn spheres(&self) -> &[Sphere] {
