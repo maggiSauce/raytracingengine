@@ -3,6 +3,7 @@ mod sphere;
 mod colour;
 mod utils;
 
+use crate::colour::write_color;
 use crate::sphere::Sphere;
 use crate::vector::{Vec3};
 use colour::unpack_rgb;
@@ -26,7 +27,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let scene = create_scene_from_file(&args[1]).unwrap();
     println!("{:#?}", scene);
 
-    let ppm_file = create_output_ppm_file(&args[2], &scene);
+    let mut ppm_file = create_output_ppm_file(&args[2], &scene)?;
+    write_color(&mut ppm_file, Vec3{ x: 0.5, y: 0.5, z: 0.5} )?;
+
+    let viewport_vector_height = Vec3 { x: 0.0, y: scene.dimensions().0 as f64, z: 0.0 };
+    let viewport_vector_width = Vec3 { x: scene.dimensions().1 as f64 , y: 0.0, z: 0.0 };
 
     Ok(())
 }

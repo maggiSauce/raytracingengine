@@ -8,15 +8,15 @@ use std::io::{self};
 
 #[derive(Debug)]
 pub struct Light {
-    position: Vec3,
-    brightness: f64,
+    pub position: Vec3,
+    pub brightness: f64,
 }
 
 #[derive(Debug)]
 pub struct Viewport {
-    viewport_height: f32,
-    viewport_width: f32,
-    focal_length: f32,
+    pub viewport_height: f32,
+    pub viewport_width: f32,
+    pub focal_length: f32,
 }
 
 #[derive(Debug)]
@@ -31,6 +31,33 @@ pub struct Scene {
     bg_colour_index: u32,
 
     spheres: Vec<Sphere>,
+}
+
+impl Scene {
+    /// returns dimensions of the scene in the format (imageH, imageW)
+    pub fn dimensions(&self) -> (i32, i32) {
+        (self.image_height, self.image_width)
+    }
+
+    pub fn viewport(&self) -> &Viewport {
+        &self.viewport
+    }
+
+    pub fn light(&self) -> &Light {
+        &self.light
+    }
+
+    pub fn colors(&self) -> &[u32] {
+        &self.colors
+    }
+
+    pub fn bg_colour_index(&self) -> u32 {
+        self.bg_colour_index
+    }
+
+    pub fn spheres(&self) -> &[Sphere] {
+        &self.spheres
+    }
 }
 
 pub fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
