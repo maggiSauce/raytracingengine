@@ -225,7 +225,9 @@ fn calculate_surface_colour(spheres: &[Sphere], target_sphere_index: usize, ray:
     let mut shadow_t = 0.0;
 
     for sphere in spheres {
-        if sphere.does_intersect(&intersection_point, &shadow_ray, &mut shadow_t) && shadow_t < 1.0 {
+        // offset by a small margin to avoid casting a shadow with own sphere
+        let offset_intersection_point = intersection_point + surface_normal * 0.001;    
+        if sphere.does_intersect(&offset_intersection_point, &shadow_ray, &mut shadow_t) && shadow_t < 1.0 {
             surface_lighting_colour = surface_lighting_colour * SHADOWFACTOR;
             break;
         }
