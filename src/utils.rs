@@ -76,8 +76,8 @@ pub fn create_scene_from_file(path: &str) -> Result<Scene, io::Error>{
     let viewport_height: f32 = lines.next().unwrap().parse().unwrap();
     let viewport_width: f32 = (image_width as f32 / image_height as f32) * viewport_height;
     
-    let viewport_height_vec = Vec3 { x: 0.0, y: image_height as f64, z: 0.0 };
-    let viewport_width_vec = Vec3 { x: image_width as f64, y: 0.0, z: 0.0 };
+    let viewport_height_vec = Vec3 { x: 0.0, y: viewport_height as f64, z: 0.0 };
+    let viewport_width_vec = Vec3 { x: viewport_width as f64, y: 0.0, z: 0.0 };
 
     let viewport = Viewport {
         height: viewport_height,
@@ -156,7 +156,7 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
     // }
 
     let bg_colour = unpack_rgb(scene.colors()[scene.bg_colour_index as usize]);
-    
+
     printdebug!(format!("image_height: {} image_width: {}", scene.image_height, scene.image_width));
 
     for y in 0..scene.image_height {
@@ -172,8 +172,8 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
                 y: scene.viewport.half_height_vec.y - (y as f64 + 0.5) * scene.viewport.pixel_height.y,
                 z: -(scene.viewport.focal_length as f64),
             };
-            ray = ray + CAMERA;     // ray is a vector from camera to pixel location on viewport
-            printdebug!(format!("Ray: {:#?} Camera: {:#?}", ray, CAMERA));
+            // ray = ray + CAMERA;     // ray is a vector from camera to pixel location on viewport
+            // printdebug!(format!("Ray: {:#?} Camera: {:#?}", ray, CAMERA));
 
             // .iter loops through every element in scene.spheres
             // .enumerate adds an index to each element: (0, sphere1)
@@ -189,7 +189,7 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
                         None
                     }
                 })
-                .min_by(|a,b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+                .min_by(|a, b| a.0.total_cmp(&b.0));
 
             // check for sphere intersection
             if let Some((min_t, closest_sphere_index)) = closest_hit {  // if let returns true if closest_hit matches the pattern (f64, usize)
@@ -201,13 +201,14 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
 
         }
     }
+
     Ok(())
 }
 
 /*
     Calculates the lighting and shadow for a ray and returns the surface lighting colour
 */
-fn calculate_surface_colour(spheres: &Vec<Sphere>, target_sphere_index: usize, ray: Vec3, min_t: f64, light: &Light) -> Vec3 {
+fn calculate_surface_colour(spheres: &[Sphere], target_sphere_index: usize, ray: Vec3, min_t: f64, light: &Light) -> Vec3 {
     let target_sphere = &spheres[target_sphere_index];
     let intersection_point = CAMERA + (ray * min_t);
     let surface_normal = (intersection_point - target_sphere.pos).normalize();
@@ -224,7 +225,7 @@ fn calculate_surface_colour(spheres: &Vec<Sphere>, target_sphere_index: usize, r
     let mut shadow_t = 0.0;
 
     for sphere in spheres {
-        if sphere.does_intersect(&intersection_point, &shadow_ray, &mut shadow_t) {
+        if sphere.does_intersect(&intersection_point, &shadow_ray, &mut shadow_t) && shadow_t < 1.0 {
             surface_lighting_colour = surface_lighting_colour * SHADOWFACTOR;
             break;
         }
