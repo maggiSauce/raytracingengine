@@ -156,7 +156,7 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
     // }
 
     let bg_colour = unpack_rgb(scene.colors()[scene.bg_colour_index as usize]);
-
+    
     printdebug!(format!("image_height: {} image_width: {}", scene.image_height, scene.image_width));
 
     for y in 0..scene.image_height {
@@ -165,7 +165,7 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
         }
         for x in 0..scene.image_width {
             // variable to keep track of pixel colour; divided by 9 before printing
-            let mut pixel_colour_average = Vec3{ x: 0.0, y: 0.0, z: 0.0 };
+            // let mut pixel_colour_average = Vec3{ x: 0.0, y: 0.0, z: 0.0 };
 
             let mut ray = Vec3 {
                 x: (x as f64 + 0.5) * scene.viewport.pixel_width.x - scene.viewport.half_width_vec.x,
@@ -173,10 +173,7 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
                 z: -(scene.viewport.focal_length as f64),
             };
             ray = ray + CAMERA;     // ray is a vector from camera to pixel location on viewport
-
-            let mut t = f64::MAX;
-            let mut min_t = f64::MAX;   // scales the rayDir vector to the intersection point
-            let mut closest_sphere_index = 0;
+            printdebug!(format!("Ray: {:#?} Camera: {:#?}", ray, CAMERA));
 
             // .iter loops through every element in scene.spheres
             // .enumerate adds an index to each element: (0, sphere1)
@@ -204,7 +201,6 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
 
         }
     }
-
     Ok(())
 }
 
