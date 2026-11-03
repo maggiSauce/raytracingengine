@@ -10,6 +10,7 @@ pub fn unpack_rgb(packed_rgb: u32) -> Vec3 {
     }
 }
 
+/// colour must be in rgb format (0 to 1)
 pub fn write_color(file: &mut impl Write, colour: Vec3) -> io::Result<()> {
     write!(
         file, "{} {} {}", 

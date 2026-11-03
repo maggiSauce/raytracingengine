@@ -33,7 +33,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     printdebug!(format!("{:#?}", scene));
 
     let mut ppm_file = create_output_ppm_file(&args[2], &scene)?;
-    write_color(&mut ppm_file, Vec3{ x: 0.5, y: 0.5, z: 0.5} )?;
+    render(&mut ppm_file, scene);
+    // write_color(&mut ppm_file, Vec3{ x: 0.5, y: 0.5, z: 0.5} )?;
 
     Ok(())
 }
