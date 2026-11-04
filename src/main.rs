@@ -16,6 +16,10 @@ use std::io;
 
 const SHADOWFACTOR: f64 = 0.1;
 const CAMERA: Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
+#[cfg(feature = "aa")]
+const AA_SAMPLES: u8= 3;
+#[cfg(not(feature = "aa"))]
+const AA_SAMPLES: u8 = 1;
 const DEFAULT_COLOR: u32 = 0x3f3f3f;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

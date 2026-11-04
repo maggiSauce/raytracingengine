@@ -1,3 +1,4 @@
+use crate::AA_SAMPLES;
 use crate::CAMERA;
 use crate::DEFAULT_COLOR;
 use crate::SHADOWFACTOR;
@@ -165,9 +166,8 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
         }
         for x in 0..scene.image_width {
             // variable to keep track of pixel colour; divided by 9 before printing
-            // let mut pixel_colour_average = Vec3{ x: 0.0, y: 0.0, z: 0.0 };
-
-            let mut ray = Vec3 {
+            let mut pixel_colour_average = Vec3{ x: 0.0, y: 0.0, z: 0.0 };
+            let ray = Vec3 {
                 x: (x as f64 + 0.5) * scene.viewport.pixel_width.x - scene.viewport.half_width_vec.x,
                 y: scene.viewport.half_height_vec.y - (y as f64 + 0.5) * scene.viewport.pixel_height.y,
                 z: -(scene.viewport.focal_length as f64),
@@ -175,30 +175,46 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
             // ray = ray + CAMERA;     // ray is a vector from camera to pixel location on viewport
             // printdebug!(format!("Ray: {:#?} Camera: {:#?}", ray, CAMERA));
 
-            // .iter loops through every element in scene.spheres
-            // .enumerate adds an index to each element: (0, sphere1)
-            // find closest sphere by selecting sphere with smallest t
-            let closest_hit = scene.spheres
-                .iter()
-                .enumerate()
-                .filter_map(|(i, sphere)| {
-                    let mut t = f64::MAX;
-                    if sphere.does_intersect(&CAMERA, &ray, &mut t) {
-                        Some((t, i))
+            /* Anti Aliasing */
+            for i in 0..AA_SAMPLES {
+                for j in 0..AA_SAMPLES {
+                    //  float rayX = (x + ((1.0f/6)  + (j * (1.0f/3)))) * pixelWidth.x - halfVportVecW.x;
+                    // float rayY = halfVportVecH.y - (y + ((1.0f/6) + (i * (1.0f/3)))) * pixelHeight.y;
+                    // float rayZ = -focalLength;
+                    let ray = Vec3 {
+                        x: (x as f64 + (1.0/6.0) + (j as f64 * (1.0/AA_SAMPLES as f64))) * scene.viewport.pixel_width.x - scene.viewport.half_width_vec.x,
+                        y: scene.viewport.half_height_vec.y - (y as f64 + (1.0/AA_SAMPLES as f64) + i as f64 * (1.0/AA_SAMPLES as f64)) * scene.viewport.pixel_height.y, 
+                        z: -(scene.viewport.focal_length as f64),
+                    };
+
+
+                    // .iter loops through every element in scene.spheres
+                    // .enumerate adds an index to each element: (0, sphere1)
+                    // find closest sphere by selecting sphere with smallest t
+                    let closest_hit = scene.spheres
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(i, sphere)| {
+                            let mut t = f64::MAX;
+                            if sphere.does_intersect(&CAMERA, &ray, &mut t) {
+                                Some((t, i))
+                            } else {
+                                None
+                            }
+                        })
+                        .min_by(|a, b| a.0.total_cmp(&b.0));
+
+                    // check for sphere intersection
+                    if let Some((min_t, closest_sphere_index)) = closest_hit {  // if let returns true if closest_hit matches the pattern (f64, usize)
+                        let surface_lighting_colour = calculate_surface_colour(&scene.spheres, closest_sphere_index, ray, min_t, &scene.light);
+                        pixel_colour_average = pixel_colour_average + surface_lighting_colour;
                     } else {
-                        None
+                        pixel_colour_average = pixel_colour_average + bg_colour;
                     }
-                })
-                .min_by(|a, b| a.0.total_cmp(&b.0));
-
-            // check for sphere intersection
-            if let Some((min_t, closest_sphere_index)) = closest_hit {  // if let returns true if closest_hit matches the pattern (f64, usize)
-                let surface_lighting_colour = calculate_surface_colour(&scene.spheres, closest_sphere_index, ray, min_t, &scene.light);
-                write_color(output_file, surface_lighting_colour);
-            } else {
-                write_color(output_file, bg_colour);
+                }
             }
-
+            pixel_colour_average = pixel_colour_average / (AA_SAMPLES * AA_SAMPLES) as f64;
+            write_color(output_file, pixel_colour_average)?;
         }
     }
 
