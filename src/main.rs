@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
         dbg!(&args);
-        panic!("Expected 3 program args. Recieved {}\n Usage: Cargo run <input_path> <output_path>", args.len());
+        panic!("Expected 3 program args. Recieved {}\n Usage: Cargo run --features \"debug,aa\" <input_path> <output_path>", args.len());
     }
 
     // let scene: Scene = create_scene_from_file(args[1]);
