@@ -1,6 +1,5 @@
 use crate::AA_SAMPLES;
 use crate::CAMERA;
-use crate::DEFAULT_COLOR;
 use crate::SHADOWFACTOR;
 use crate::colour::unpack_rgb;
 use crate::colour::write_color;
@@ -10,7 +9,6 @@ use crate::sphere::*;
 use std::fs::File;
 use std::io::Write;
 
-use std::ops::Add;
 use std::{fs};
 use std::io::{self};
 
@@ -167,14 +165,8 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
         for x in 0..scene.image_width {
             // variable to keep track of pixel colour; divided by 9 before printing
             let mut pixel_colour_average = Vec3{ x: 0.0, y: 0.0, z: 0.0 };
-            let ray = Vec3 {
-                x: (x as f64 + 0.5) * scene.viewport.pixel_width.x - scene.viewport.half_width_vec.x,
-                y: scene.viewport.half_height_vec.y - (y as f64 + 0.5) * scene.viewport.pixel_height.y,
-                z: -(scene.viewport.focal_length as f64),
-            };
-            // ray = ray + CAMERA;     // ray is a vector from camera to pixel location on viewport
             // printdebug!(format!("Ray: {:#?} Camera: {:#?}", ray, CAMERA));
-
+            
             /* Anti Aliasing */
             for i in 0..AA_SAMPLES {
                 for j in 0..AA_SAMPLES {
@@ -186,12 +178,13 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
                         y: scene.viewport.half_height_vec.y - (y as f64 + (1.0/AA_SAMPLES as f64) + i as f64 * (1.0/AA_SAMPLES as f64)) * scene.viewport.pixel_height.y, 
                         z: -(scene.viewport.focal_length as f64),
                     };
-
+                    // ray = ray + CAMERA;     // ray is a vector from camera to pixel location on viewport
+                    
 
                     // .iter loops through every element in scene.spheres
                     // .enumerate adds an index to each element: (0, sphere1)
                     // find closest sphere by selecting sphere with smallest t
-                    let closest_hit = scene.spheres
+                    let closest_hit = scene.spheres()
                         .iter()
                         .enumerate()
                         .filter_map(|(i, sphere)| {
@@ -206,7 +199,7 @@ pub fn render(output_file: &mut impl Write, scene: Scene) -> Result<(), Box<dyn 
 
                     // check for sphere intersection
                     if let Some((min_t, closest_sphere_index)) = closest_hit {  // if let returns true if closest_hit matches the pattern (f64, usize)
-                        let surface_lighting_colour = calculate_surface_colour(&scene.spheres, closest_sphere_index, ray, min_t, &scene.light);
+                        let surface_lighting_colour = calculate_surface_colour(&scene.spheres(), closest_sphere_index, ray, min_t, &scene.light);
                         pixel_colour_average = pixel_colour_average + surface_lighting_colour;
                     } else {
                         pixel_colour_average = pixel_colour_average + bg_colour;

@@ -46,8 +46,6 @@ impl Sphere {
             None => false   // case for no intersection
         }
     }
-    
-    
 }
 
 pub fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
