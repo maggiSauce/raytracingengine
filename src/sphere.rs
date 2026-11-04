@@ -1,5 +1,5 @@
-use crate::vector::*;
 use crate::unpack_rgb;
+use crate::vector::*;
 
 #[derive(Debug)]
 pub struct Sphere {
@@ -19,23 +19,23 @@ impl Sphere {
 
     pub fn does_intersect(&self, ray_pos: &Vec3, ray_dir: &Vec3, t: &mut f64) -> bool {
         let v: Vec3 = *ray_pos - self.pos;
-        let a = dot(*ray_dir,*ray_dir);
+        let a = dot(*ray_dir, *ray_dir);
         let b = 2.0 * dot(*ray_dir, v);
         let c = dot(v, v) - (self.r * self.r);
 
         match solve_quadratic(a, b, c) {
             Some((t1, t2)) => {
                 let mut t_hit = f64::MAX;
-                
+
                 if t1 > 0.0 {
                     t_hit = t1;
                 }
                 if t2 > 0.0 && t2 < t_hit {
                     t_hit = t2;
                 }
-                
+
                 // case for it either intersection point is negative or sphere is behind camera
-                if t_hit == f64::MAX {  
+                if t_hit == f64::MAX {
                     return false;
                 }
 
@@ -43,7 +43,7 @@ impl Sphere {
                 true
             }
 
-            None => false   // case for no intersection
+            None => false, // case for no intersection
         }
     }
 }
@@ -55,7 +55,7 @@ pub fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
     if descriminant < 0.0 {
         return None;
     }
-    
+
     let sqrt_d = descriminant.sqrt();
 
     let t1 = (-b + sqrt_d) / (2.0 * a);
@@ -64,7 +64,10 @@ pub fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<(f64, f64)> {
     Some((t1, t2))
 }
 
-pub fn create_sphere(mut instructions: std::str::SplitWhitespace<'_>, colours: &Vec<u32>) -> Sphere {
+pub fn create_sphere(
+    mut instructions: std::str::SplitWhitespace<'_>,
+    colours: &Vec<u32>,
+) -> Sphere {
     let x: f64 = instructions.next().unwrap().parse().unwrap();
     let y: f64 = instructions.next().unwrap().parse().unwrap();
     let z: f64 = instructions.next().unwrap().parse().unwrap();
@@ -73,13 +76,9 @@ pub fn create_sphere(mut instructions: std::str::SplitWhitespace<'_>, colours: &
 
     let sphere_col_index: usize = instructions.next().unwrap().parse().unwrap();
     let sphere_rgb = unpack_rgb(colours[sphere_col_index]);
-    
+
     Sphere {
-        pos: Vec3 {
-            x: x,
-            y: y,
-            z: z,
-        },
+        pos: Vec3 { x: x, y: y, z: z },
         r: radius,
         colour: sphere_rgb,
     }
@@ -97,7 +96,7 @@ mod tests {
     }
 
     fn ray_dir_normalized(x: f64, y: f64, z: f64) -> Vec3 {
-        let len = (x*x + y*y + z*z).sqrt();
+        let len = (x * x + y * y + z * z).sqrt();
         v(x / len, y / len, z / len)
     }
 

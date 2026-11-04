@@ -1,4 +1,3 @@
-
 #[macro_export]
 /* Usage:
  *   printdebug!("Message") => [DEBUG] Message
@@ -15,5 +14,5 @@ macro_rules! printdebug {
             let debug_type = $debug_type.unwrap_or("DEBUG");
             println!("[{}] {}", debug_type, $message);
         }
-    }
+    };
 }

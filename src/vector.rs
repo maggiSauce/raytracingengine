@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
@@ -16,7 +16,7 @@ impl Add for Vec3 {
             y: self.y + other.y,
             z: self.z + other.z,
         }
-    }    
+    }
 }
 
 impl Sub for Vec3 {
@@ -46,8 +46,8 @@ impl Mul<f64> for Vec3 {
 impl Div<f64> for Vec3 {
     type Output = Vec3;
 
-    fn div(self, d:f64) -> Vec3 {
-        self * (1.0/d)
+    fn div(self, d: f64) -> Vec3 {
+        self * (1.0 / d)
     }
 }
 
@@ -64,7 +64,6 @@ impl Vec3 {
         self / self.length()
     }
 }
-
 
 pub fn dot(v1: Vec3, v2: Vec3) -> f64 {
     (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
@@ -89,12 +88,7 @@ mod tests {
     const EPSILON: f64 = 1e-10;
 
     fn approx_eq(a: f64, b: f64) {
-        assert!(
-            (a - b).abs() < EPSILON,
-            "Expected {}, got {}",
-            b,
-            a
-        );
+        assert!((a - b).abs() < EPSILON, "Expected {}, got {}", b, a);
     }
 
     fn assert_vec3_eq(v: Vec3, x: f64, y: f64, z: f64) {
@@ -105,8 +99,16 @@ mod tests {
 
     #[test]
     fn add_vectors() {
-        let a = Vec3 { x: 1.0, y: 2.0, z: 3.0 };
-        let b = Vec3 { x: 4.0, y: 5.0, z: 6.0 };
+        let a = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+        let b = Vec3 {
+            x: 4.0,
+            y: 5.0,
+            z: 6.0,
+        };
 
         let c = a + b;
 
@@ -115,8 +117,16 @@ mod tests {
 
     #[test]
     fn subtract_vectors() {
-        let a = Vec3 { x: 5.0, y: 7.0, z: 9.0 };
-        let b = Vec3 { x: 1.0, y: 2.0, z: 3.0 };
+        let a = Vec3 {
+            x: 5.0,
+            y: 7.0,
+            z: 9.0,
+        };
+        let b = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
 
         let c = a - b;
 
@@ -125,7 +135,11 @@ mod tests {
 
     #[test]
     fn multiply_by_scalar() {
-        let v = Vec3 { x: 1.0, y: -2.0, z: 3.0 };
+        let v = Vec3 {
+            x: 1.0,
+            y: -2.0,
+            z: 3.0,
+        };
 
         let r = v * 2.5;
 
@@ -134,7 +148,11 @@ mod tests {
 
     #[test]
     fn divide_by_scalar() {
-        let v = Vec3 { x: 2.0, y: -4.0, z: 6.0 };
+        let v = Vec3 {
+            x: 2.0,
+            y: -4.0,
+            z: 6.0,
+        };
 
         let r = v / 2.0;
 
@@ -143,21 +161,33 @@ mod tests {
 
     #[test]
     fn length_squared() {
-        let v = Vec3 { x: 2.0, y: 3.0, z: 6.0 };
+        let v = Vec3 {
+            x: 2.0,
+            y: 3.0,
+            z: 6.0,
+        };
 
         approx_eq(v.length2(), 49.0);
     }
 
     #[test]
     fn length() {
-        let v = Vec3 { x: 3.0, y: 4.0, z: 12.0 };
+        let v = Vec3 {
+            x: 3.0,
+            y: 4.0,
+            z: 12.0,
+        };
 
         approx_eq(v.length(), 13.0);
     }
 
     #[test]
     fn normalize_vector() {
-        let v = Vec3 { x: 3.0, y: 0.0, z: 4.0 };
+        let v = Vec3 {
+            x: 3.0,
+            y: 0.0,
+            z: 4.0,
+        };
 
         let n = v.normalize();
 
@@ -167,31 +197,59 @@ mod tests {
 
     #[test]
     fn dot_product() {
-        let a = Vec3 { x: 1.0, y: 2.0, z: 3.0 };
-        let b = Vec3 { x: 4.0, y: -5.0, z: 6.0 };
+        let a = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+        let b = Vec3 {
+            x: 4.0,
+            y: -5.0,
+            z: 6.0,
+        };
 
         approx_eq(dot(a, b), 12.0);
     }
 
     #[test]
     fn distance_squared() {
-        let a = Vec3 { x: 1.0, y: 2.0, z: 3.0 };
-        let b = Vec3 { x: 4.0, y: 6.0, z: 3.0 };
+        let a = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+        let b = Vec3 {
+            x: 4.0,
+            y: 6.0,
+            z: 3.0,
+        };
 
         approx_eq(distance2(a, b), 25.0);
     }
 
     #[test]
     fn distance_test() {
-        let a = Vec3 { x: 1.0, y: 2.0, z: 3.0 };
-        let b = Vec3 { x: 4.0, y: 6.0, z: 3.0 };
+        let a = Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        };
+        let b = Vec3 {
+            x: 4.0,
+            y: 6.0,
+            z: 3.0,
+        };
 
         approx_eq(distance(a, b), 5.0);
     }
 
     #[test]
     fn normalize_unit_vector() {
-        let v = Vec3 { x: 1.0, y: 0.0, z: 0.0 };
+        let v = Vec3 {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0,
+        };
 
         let n = v.normalize();
 
@@ -200,14 +258,22 @@ mod tests {
 
     #[test]
     fn dot_with_self_equals_length_squared() {
-        let v = Vec3 { x: 2.0, y: -3.0, z: 6.0 };
+        let v = Vec3 {
+            x: 2.0,
+            y: -3.0,
+            z: 6.0,
+        };
 
         approx_eq(dot(v, v), v.length2());
     }
 
     #[test]
     fn distance_to_self_is_zero() {
-        let v = Vec3 { x: -5.0, y: 1.0, z: 8.0 };
+        let v = Vec3 {
+            x: -5.0,
+            y: 1.0,
+            z: 8.0,
+        };
 
         approx_eq(distance(v, v), 0.0);
         approx_eq(distance2(v, v), 0.0);
